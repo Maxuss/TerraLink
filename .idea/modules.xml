@@ -2,6 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://$PROJECT_DIR$/Fabric/Fabric.iml" filepath="$PROJECT_DIR$/Fabric/Fabric.iml" />
       <module fileurl="file://$PROJECT_DIR$/TerraLink.iml" filepath="$PROJECT_DIR$/TerraLink.iml" />
     </modules>
   </component>
