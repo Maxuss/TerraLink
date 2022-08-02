@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 1,
+  "id": "terralink",
+  "version": "${version}",
+  "name": "TerraLink",
+  "description": "TerraLink is a mod that allows you to transfer items and more to your terraria world!",
+  "authors": [
+    "maxus"
+  ],
+  "contact": {
+    "repo": "https://github.com/Maxuss/TerraLink"
+  },
+  "license": "GPL-3.0",
+  "icon": "assets/terralink/icon.png",
+  "environment": "*",
+  "entrypoints": {
+    "client": [
+      "space.maxus.terralink.client.TerraLinkClient"
+    ],
+    "main": [
+      "space.maxus.terralink.TerraLink"
+    ]
+  },
+  "mixins": [
+    "terralink.json"
+  ],
+  "depends": {
+    "fabricloader": ">=0.14.8",
+    "fabric": "*",
+    "minecraft": "1.18.2"
+  }
+}
