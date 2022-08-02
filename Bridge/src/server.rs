@@ -1,5 +1,6 @@
 use std::sync::Arc;
 use log::info;
+use tokio::io::AsyncReadExt;
 use tokio::net::tcp::OwnedWriteHalf;
 use tokio::net::TcpListener;
 use tokio::sync::Mutex;
@@ -17,8 +18,9 @@ pub async fn bind(opts: BridgeOptions) -> anyhow::Result<()> {
     let bridge_info = "TerraLink Bridge/0.1.0".to_string();
 
     loop {
-        if let Ok((stream, addr)) = server.accept().await {
+        if let Ok((mut stream, addr)) = server.accept().await {
             info!("Receiving connection from client at {}!", addr);
+            let mut end_str = String::new();
             let mut client = EarlyStageClient::new(stream, addr, opts.clone());
             let ty = client.do_handshake().await;
             if let Err(err) = ty {

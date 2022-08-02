@@ -36,7 +36,7 @@ macro_rules! packets {
                 match &self {
                     $(
                     ProtocolPacket::$name(packet) => {
-                        $id.write(buf).await?;
+                        ($id as u8).write(buf).await?;
                         packet.write(buf).await?;
                     }
                     ),*

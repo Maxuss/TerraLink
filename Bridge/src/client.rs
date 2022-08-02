@@ -34,13 +34,13 @@ impl EarlyStageClient {
     }
 
     pub async fn read_packet(&mut self) -> anyhow::Result<ProtocolPacket> {
-        let mut buffer = Vec::new();
-        let amount_read = timeout(Duration::from_secs(5), self.reader.read(&mut buffer)).await??;
+        let mut buffer = [0u8; 512];
+        let amount_read = timeout(Duration::from_secs(10), self.reader.read(&mut buffer)).await??;
         if amount_read == 0 {
             error!("Client sent 0 bytes!");
             bail!("Read 0 bytes!")
         }
-        let mut cursor = Cursor::new(buffer);
+        let mut cursor = Cursor::new(buffer.to_vec());
         ProtocolPacket::read(&mut cursor).await
     }
 
@@ -202,25 +202,26 @@ impl Transmitter for TransmitterTM {
 
 struct PacketReader {
     reader: OwnedReadHalf,
-    sender: Sender<ProtocolPacket>
+    sender: Sender<ProtocolPacket>,
+    staging_buf: [u8; 512]
 }
 
 impl PacketReader {
     pub fn new(reader: OwnedReadHalf, sender: Sender<ProtocolPacket>) -> Self {
         Self {
             reader,
-            sender
+            sender,
+            staging_buf: [0; 512]
         }
     }
 
     async fn read_packet(&mut self) -> anyhow::Result<ProtocolPacket> {
-        let mut buffer = Vec::new();
-        let amount_read = timeout(Duration::from_secs(6), self.reader.read(&mut buffer)).await??;
+        let amount_read = timeout(Duration::from_secs(6), self.reader.read(&mut self.staging_buf)).await??;
         if amount_read == 0 {
             error!("Client sent 0 bytes!");
             bail!("Read 0 bytes!")
         }
-        let mut cursor = Cursor::new(buffer);
+        let mut cursor = Cursor::new(self.staging_buf[..amount_read].to_vec());
         ProtocolPacket::read(&mut cursor).await
     }
 

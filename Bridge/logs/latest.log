@@ -1,0 +1,18 @@
+[2022-08-02 16:37:43] <terralink_bridge::client> [INFO]: Client 127.0.0.1:38366 connected with tModLoader version 2022.6.96.4
+[2022-08-02 16:41:18] <terralink_bridge::server> [INFO]: Receiving connection from client at 127.0.0.1:59660!
+[2022-08-02 16:41:18] <terralink_bridge::client> [INFO]: Client 127.0.0.1:59660 connected with tModLoader version 2022.6.96.4
+[2022-08-02 16:45:42] <terralink_bridge> [INFO]: Starting bridge...
+[2022-08-02 16:45:42] <terralink_bridge::server> [INFO]: Bridge Server started on 127.0.0.1:25535
+[2022-08-02 16:49:18] <terralink_bridge::server> [INFO]: Receiving connection from client at 127.0.0.1:52674!
+[2022-08-02 16:49:18] <terralink_bridge::client> [INFO]: Client 127.0.0.1:52674 connected with tModLoader version 2022.6.96.4
+[2022-08-02 16:50:08] <terralink_bridge::server> [INFO]: Receiving connection from client at 127.0.0.1:41476!
+[2022-08-02 16:50:08] <terralink_bridge::client> [INFO]: Client 127.0.0.1:41476 connected with tModLoader version 2022.6.96.4
+[2022-08-02 16:51:47] <terralink_bridge::server> [INFO]: Receiving connection from client at 127.0.0.1:57204!
+[2022-08-02 16:51:47] <terralink_bridge::client> [INFO]: Client 127.0.0.1:57204 connected with tModLoader version 2022.6.96.4
+[2022-08-02 16:53:21] <terralink_bridge> [INFO]: Starting bridge...
+[2022-08-02 16:53:21] <terralink_bridge::server> [INFO]: Bridge Server started on 127.0.0.1:25535
+[2022-08-02 16:54:17] <terralink_bridge::server> [INFO]: Receiving connection from client at 127.0.0.1:47064!
+[2022-08-02 16:54:17] <terralink_bridge::client> [INFO]: Client 127.0.0.1:47064 connected with tModLoader version 2022.6.96.4
+[2022-08-02 16:55:11] <terralink_bridge::server> [INFO]: Receiving connection from client at 127.0.0.1:39906!
+[2022-08-02 16:55:11] <terralink_bridge::client> [INFO]: Client 127.0.0.1:39906 connected with Fabric minecraft version 1.18.2
+[2022-08-02 16:55:11] <terralink_bridge::client> [INFO]: Entering main translation loop for client 127.0.0.1:39906

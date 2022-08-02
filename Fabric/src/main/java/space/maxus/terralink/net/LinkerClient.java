@@ -1,45 +1,50 @@
 package space.maxus.terralink.net;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
+import org.jctools.queues.MpmcArrayQueue;
+import org.jctools.queues.MpscArrayQueue;
 import space.maxus.terralink.TerraLink;
 import space.maxus.terralink.net.packets.PacketAdvance;
 import space.maxus.terralink.net.packets.PacketConnect;
 import space.maxus.terralink.net.packets.PacketDisconnect;
-import space.maxus.terralink.util.MpscChannel;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.net.Socket;
+import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Semaphore;
-import java.util.concurrent.atomic.AtomicReferenceFieldUpdater;
 
 public class LinkerClient {
     private BufferedOutputStream outputStream;
     private BufferedInputStream inputStream;
     private Socket socket;
 
-    private final MpscChannel<Packet> packetsTx = new MpscChannel<>(AtomicReferenceFieldUpdater.newUpdater(Packet.class, Packet.class, "nextPacket"));
-    private final MpscChannel<Packet> packetsRx = new MpscChannel<>(AtomicReferenceFieldUpdater.newUpdater(Packet.class, Packet.class, "nextPacket"));
-    private final Semaphore txLock = new Semaphore(16);
-    private final Semaphore rxLock = new Semaphore(16);
     public static final ExecutorService networkExecutor = Executors.newFixedThreadPool(4, new ThreadFactoryBuilder().setNameFormat("TerraLink Network").build());
 
     public void sendPacket(Packet packet) {
-        if(packetsTx.send(packet))
-            txLock.release();
+        try {
+            packet.writeSelf(outputStream);
+            outputStream.flush();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
+    @SuppressWarnings("StatementWithEmptyBody")
     public Packet readPacket() {
+        int id;
         try {
-            rxLock.acquire();
-            return packetsRx.get();
-        } catch (InterruptedException e) {
-            TerraLink.LOGGER.warn("Could not acquire RX Semaphore lock: " + e.getMessage());
-            return null;
+            while((id = inputStream.read()) == 0);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
+        if(id == -1)
+            return null;
+        return Protocol.readPacket(Protocol.PacketID.values()[id], inputStream);
     }
 
     public void connect() {
@@ -52,8 +57,8 @@ public class LinkerClient {
         TerraLink.LOGGER.info("Connected to bridge at 127.0.0.1:25535");
 
         try {
-            outputStream = new BufferedOutputStream(socket.getOutputStream());
-            inputStream = new BufferedInputStream(socket.getInputStream());
+            outputStream = new BufferedOutputStream(socket.getOutputStream(), 1024);
+            inputStream = new BufferedInputStream(socket.getInputStream(), 1024);
         } catch (IOException e) {
             TerraLink.LOGGER.error("Could not retrieve input/output streams from socket: " + e.getMessage());
             return;
@@ -61,43 +66,7 @@ public class LinkerClient {
 
         TerraLink.LOGGER.info("Starting network threads...");
 
-        networkExecutor.execute(this::reader);
-        networkExecutor.execute(this::writer);
         networkExecutor.execute(this::doHandshake);
-    }
-
-    private void reader() {
-        while(socket.isConnected()) {
-            try {
-                var id = inputStream.read();
-                var packet = Protocol.readPacket(Protocol.PacketID.values()[id], inputStream);
-                if(packetsRx.send(packet))
-                    rxLock.release();
-            } catch (IOException e) {
-                TerraLink.LOGGER.warn(e.getMessage());
-            }
-        }
-    }
-
-    private void writer() {
-        while(socket.isConnected()) {
-            try {
-                txLock.acquire();
-                var next = packetsTx.get();
-                if(next == null)
-                    continue;
-                do {
-                    try {
-                        next.writeSelf(outputStream);
-                    } catch (IOException e) {
-                        TerraLink.LOGGER.warn("Could not write packet " + next + ": " + e.getMessage());
-                    }
-                    next = packetsTx.getNext();
-                } while(next != null);
-            } catch (InterruptedException err) {
-                TerraLink.LOGGER.warn("Could not acquire TX Semaphore lock!");
-            }
-        }
     }
 
     private void doHandshake() {

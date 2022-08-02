@@ -12,7 +12,10 @@ flume = "0.10.13"
 anyhow = "1.0.59"
 async-trait = "0.1.57"
 log = "0.4.17"
-log4rs = "1.1.1"
+
+[dependencies.log4rs]
+version = "1.1.1"
+features = ["gzip"]
 
 [dependencies.toml]
 version = "0.5.9"

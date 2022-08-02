@@ -16,6 +16,13 @@ public class PacketDisconnect extends Packet {
         return reason;
     }
 
+    @Override
+    public String toString() {
+        return "PacketDisconnect{" +
+                "reason='" + reason + '\'' +
+                '}';
+    }
+
     public PacketDisconnect(String reason) {
         this.reason = reason;
     }
