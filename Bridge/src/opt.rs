@@ -6,6 +6,14 @@ pub struct BridgeOptions {
     pub packet_bounds: usize
 }
 
+impl Default for BridgeOptions {
+    fn default() -> Self {
+        Self {
+            packet_bounds: default_threshold()
+        }
+    }
+}
+
 fn default_threshold() -> usize {
     return 16
 }
